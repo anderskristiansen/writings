@@ -690,11 +690,52 @@ Stars.prototype.load = function() {
 ```
 
 
-package.json
+### Steg 6. Kjør opp og test!
 
-LocalStorage -> AsyncStorage
+Da prøver vi å kjøre opp. Pang! Ja, vi mangler en del dependencies i package.json. Jeg la til de jeg visste var i bruk. `npm install` og prøv igjen. Pang!
+
+<img src="img/ReactNative12.png" width="400">
+
+Fagdag-appen kjøres vanligvis opp i et Node.js kjøretidsmiljø. React Native spinner opp i JavaScriptCore, og har ikke tilgang til en del innebyggede moduler i Node. Her ble det en del Googling, og prøving og feiling. Jeg endte til slutt opp med å bruke Webpack til å bundle appen. Det er ikke optimalt, da det blir enda en avhengighet, og den kjører saktere enn den vanlig Packageren. Det kan også hende det smeller senere, men nå fikk jeg appen opp og kjøre igjen, og var fornøyd med det. Jeg leste blant annet at Webpack ikke gikk godt sammen med React Native på Android, da man må endre portnummeret appen kjører mot, og det er ikke mulig på Android. Det er også rapportert problemer med transpilering fra ES6 med Webpack og React Native.
+
+For å kjøre igang appen med webpack måtte jeg installere noen nye npm-moduler, legge til en webpack-config, endre index.ios.js til main.js og endre appen til å kjøre mot port 8080. Bygging av appen må nå startes med `npm start` i terminalen. 
+
+### Men React fungerer ikke som React
+
+Da jeg begynte å teste appen ved å merke foredrag med stjerne oppdaget jeg at appen ikke oppførte seg som forventet. Det skjedde ingenting. Ved klikk på en stjerne ble den kalt et callback, som satt en state lengre opp i view-hierarkiet, som automatisk gjør at view (og subviews) rendres på nytt. Men problemet er at når man bruker `NavigatorIOS` ser ikke React på dette som et subview, og props bobler ikke ned og rendrer på nytt. 
+Nok en runde med Googling viste at Facebook ikke bruker `NavigatorIOS` internt, og de frir derfor til open source communityet til å ta tak i issues.  
+Facebook bruker `Navigator` internt. 
+
+> For most non-trivial apps, you will want to use Navigator - it won't be long before you run into issues when trying to do anything complex with NavigatorIOS.
+
+`Navigator` en JavaScript-implementasjon av navigasjonen. Den er mer fleksibel, men jeg synes den var vanskeligere å implementere enn NavigatorIOS, , animasjonene føltes ikke native og man får ikke den "blurry", litt gjennomsiktige navigasjonslingen. En fordel med `Navigator` er at man kan definere utseende mer selv, med custom `NavigationBar` og at `Navigator` kan brukes på tvers av iOS og Android. Jeg forsøkte også å flytte stjernemerkingen av et foredrag opp i navigasjonslinjen i `NavigatorIOS`. Men dette var ikke mulig da jeg ikke fant noen måte å oppdatere navigasjonen ved endringer i stjernemarkering, og det var heller ikke mulig å endre farge på kun stjerne-ikonet uten å sette farge for hele navigasjonslinjen. 
+
+Hvis man nå allikevel bruker `NavigatorIOS` sier erfaringer fra Internettet og tips fra Facebook at man kan opprette en event som trigges når nye props er tilgjengelig og la barne-viewet lytte på det. Men det bryter med hvordan React skal fungere, og `setProps()`  er deprecated, og kommer til å bli fjernet.
+
+> setProps and replaceProps are now deprecated. Instead, call ReactDOM.render again at the top level with the new props.
+
+Skulle jeg gått i gang med en større applikasjon ville jeg enten vurdert å bruke `Navigator` eller fikset på `NavigatorIOS`, slik at denne fungerer som `Navigator` og oppdaterer gjeldende view på stacken. Det finnes allerede flere npm-moduler basert på `Navigator`, så det kan være en ide å sjekke ut disse før man setter i gang. Og siden Facebook bruker denne implementasjonen selv er det stor sjanse for at de optimaliserer animasjonene, slik at det etter hvert føles native. 
+
+For fagdag-appen valgte jeg å legge til event/lytter i views som blir pushet på stacken (med `NavigatorIOS`):  
+
+```js
+   mixins: [Subscribable.Mixin],
+
+  componentDidMount: function() {
+    this.addListenerOn(this.props.events, 'change:star', this.update);
+  },
+
+    update: function(args){
+     this.forceUpdate();
+ },
+
+```
 
 
+Med `Navigator` må man definere en `renderScene`-funksjon for hver "scene" i navigasjonen. Det er denne funksjonen som blir rendret med gjeldende scene som parameter når state endrer seg. 
+
+
+### Moduler
 
 
 
