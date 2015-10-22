@@ -4,10 +4,10 @@ Facebook introduserte React Native under React.js i januar, og lanserte React Na
 
 ## Hva er React Native?
 
-React Native bygger på React, og litt forenklet kan man si at DOMen for web er byttet ut med native komponenter for iOS og Android. I bunnen er det samme React-kjernen som på web. Dette er enda tydeligere siste versjon av React (0.14) der react-modulen splittes i react og react-dom.
+React Native bygger på React.js, og litt forenklet kan man si at DOMen for web er byttet ut med native komponenter for iOS og Android. Så man skriver fortsatt Javascript, men får ut native apps i andre enden. I bunnen er det samme React-kjernen som på web. Dette er enda tydeligere siste versjon av React (0.14) der react-modulen splittes i react og react-dom.
 
 Potensielt kan gjenbruke mye av kodebasen i en eksisterende React.js-app, og det er noe av det jeg ønsket å utforske. Men det er viktig å understreke at med React Native streber ikke Facebook etter "write once, run anywhere", men heller "learn once, run everywhere". De så internt i Facebook at de satt på mye god Javascript-kompetanse, og ikke minst mange personer med god domenekunnskap på bestemte produkter i Facebook. Derfor ønsket man at disse utviklerne kunne implementere samme funksjonalitet, på tvers av plattformer.
-Med React Nativa har man tilgang til de kjente og kjære bibliotekene og APIene man er vant til fra webben.
+Med React Native har man tilgang til de kjente og kjære bibliotekene og APIene man er vant til fra webben.
 
 En viktig punkt er at en React Native app er ikke en HTML-app pakket inn i en native wrapper. Komponentene transformeres til native komponenter, så appen virkelig føles og yter som en native app. Facebook ville ikke ødelegge den native ytelsen, og de utnytter derfor at man kan kjøre flere tråder på native kontra på web. Alt arbeid gjøres asynkront i tråder utenfor UI-tråden, køes opp, og sendes i batcher til UI-tråden for å minimere antall operasjoner på UI-tråden. 
 
@@ -706,6 +706,8 @@ Fagdag-appen kjøres i et Node.js kjøretidsmiljø. React Native kjører opp i J
 
 For å kjøre igang appen med webpack måtte jeg installere noen nye npm-moduler, legge til en webpack-config, endre index.ios.js til main.js og endre appen til å kjøre mot port 8080. Bygging av appen må nå startes med `npm start` i terminalen. 
 
+
+
 ### Men React fungerer ikke som React
 
 Da jeg begynte å teste appen ved å merke foredrag med stjerne oppdaget jeg at appen ikke oppførte seg som forventet. Det skjedde ingenting. Ved klikk på en stjerne ble det kalt et callback, som satt en state lengre opp i view-hierarkiet, som automatisk gjør at view (og subviews) rendres på nytt. Men problemet er at når man bruker `NavigatorIOS` ser ikke React på dette som et subview, og props bobler ikke ned og rendrer på nytt. 
@@ -757,37 +759,37 @@ Så hvis man skal ta i bruk det nyeste og hippeste og være klar til release av 
 
 
 
-~~- Ikke single code base~~
-~~- Deklarativ beskrivelse av view. Tydeligere hvordan ting skal se ut. Mye matematikk. Sier hvordan vi vil at view skal se ut, så "fikser React resten". Trenger ikke å måle, og lese fra view for å se hvordan det ser ut, for så gjøre endringer på det.~~
+- ~~Ikke single code base~~
+- ~~Deklarativ beskrivelse av view. Tydeligere hvordan ting skal se ut. Mye matematikk. Sier hvordan vi vil at view skal se ut, så "fikser React resten". Trenger ikke å måle, og lese fra view for å se hvordan det ser ut, for så gjøre endringer på det.~~
 - Ulik look and feel. Vil følge guidelines for den plattformen vi bygger for. Akkurat nå kan man ikke lage native expreience med web.
-~~- Utviklingsmiljø/fart. Kjent utviklingsmiljø og debugging.  Slipper XCode og å bygge hele tiden. Bedre feilmeldinger.~~
-~~- Kan bruke f.eks Relay, fetch()~~
+- ~~Utviklingsmiljø/fart. Kjent utviklingsmiljø og debugging.  Slipper XCode og å bygge hele tiden. Bedre feilmeldinger.~~
+- ~~Kan bruke f.eks Relay, fetch()~~
 - Hvorfor native. Bedre brukeropplevelse og funksjonalitet
-~~- Trådhåndtering. Kan parallellisere. Async oppdatering av view. Gjør operasjoner utenfor main thread og køer opp operasjoner(batch) til main thread.~~
+- ~~Trådhåndtering. Kan parallellisere. Async oppdatering av view. Gjør operasjoner utenfor main thread og køer opp operasjoner(batch) til main thread.~~
 - Gesture
 - Vil ha brukeropplevelsen fra native, og utviklingsmiløet fra web.(React)
-~~- Brukes internt i Facebook
-  - Deler av "Groups", Hele Ads Manager, Arrangementer i Facebook-appen(?)~
-~~- npm moduler. Ligger allerede mange ute. Like enkelt som ellers, men man må importere noen filer i XCode-prosjektet.~~
- ~~- Biblioteker som "Relay"~~
+- ~~Brukes internt i Facebook
+  - Deler av "Groups", Hele Ads Manager, Arrangementer i Facebook-appen(?)~~
+- ~~npm moduler. Ligger allerede mange ute. Like enkelt som ellers, men man må importere noen filer i XCode-prosjektet.~~
+ - ~~Biblioteker som "Relay"~~
 - Er ikke bare enda en JS-bridge til Native. Man får med React også.
 
 
 - Spørsmål?
   - Hva med mer grafikk-krevende apps, og apps med mange custom-komponenter?
   - Kan vi gjenbruke det vi har løst på web?
-  ~~- Hva med nye API-er? Hvor fort kan man ta i bruk f.eks. 3D Touch?~~
+  - ~~Hva med nye API-er? Hvor fort kan man ta i bruk f.eks. 3D Touch?~~
   - Hva med å kjøre JS-koden på en server. Slipper man App Store da?
 
 - Utfordringer:
-  ~~- Støtte på komponenter som Facebook ikke bruker
-    - De er ærlige på at de ikke bruker NavigatorIOS, og ber open source community om hjelp på denne komponenten.
-      - Jeg fant at denne bryter med React sin virkemåte. En childview oppdaterer en state. Dette trigger en re-rendring lenger oppe i view-treet, men disse bobler ikke ned til view som er pushet på Navigator-stacken. React Native teamet bruker Navigator-komponenten, og sier at en løsning er Event-Subscriber. Men det bryter med React, og man må ta hånd om events når state endrer seg.
-      - Løst i Navigator, men jeg synes den var mer kronglete å bruke, og er en JS abstraksjon, som ikke nødvendigvis stemmer med native oppførsel
-      - Et annet problem er styling av NavigatorIOS. Prøvde med stjernemarkering. Vanskelig å oppdatere på endringer.~~
+  - ~~Støtte på komponenter som Facebook ikke bruker~~
+    - ~~De er ærlige på at de ikke bruker NavigatorIOS, og ber open source community om hjelp på denne komponenten.~~
+      - ~~Jeg fant at denne bryter med React sin virkemåte. En childview oppdaterer en state. Dette trigger en re-rendring lenger oppe i view-treet, men disse bobler ikke ned til view som er pushet på Navigator-stacken. React Native teamet bruker Navigator-komponenten, og sier at en løsning er Event-Subscriber. Men det bryter med React, og man må ta hånd om events når state endrer seg.~~
+      - ~~Løst i Navigator, men jeg synes den var mer kronglete å bruke, og er en JS abstraksjon, som ikke nødvendigvis stemmer med native oppførsel~~
+      - ~~Et annet problem er styling av NavigatorIOS. Prøvde med stjernemarkering. Vanskelig å oppdatere på endringer.~~
 
 
 - Erfaringer:
   - For å kjøre på fysisk device måtte jeg skru av "Dead code stripping i Xcode".
 
-6. Har ikke løst det å sende inn environment variabler
+Har ikke løst det å sende inn environment variabler
