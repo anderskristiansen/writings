@@ -759,6 +759,11 @@ Så hvis man skal ta i bruk det nyeste og hippeste og være klar til release av 
 
 
 
+
+# TODO:
+
+- Bilder av fagdagsappen
+
 - ~~Ikke single code base~~
 - ~~Deklarativ beskrivelse av view. Tydeligere hvordan ting skal se ut. Mye matematikk. Sier hvordan vi vil at view skal se ut, så "fikser React resten". Trenger ikke å måle, og lese fra view for å se hvordan det ser ut, for så gjøre endringer på det.~~
 - Ulik look and feel. Vil følge guidelines for den plattformen vi bygger for. Akkurat nå kan man ikke lage native expreience med web.
