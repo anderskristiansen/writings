@@ -768,8 +768,8 @@ Så hvis man skal ta i bruk det nyeste og hippeste og være klar til release av 
 - ~~Trådhåndtering. Kan parallellisere. Async oppdatering av view. Gjør operasjoner utenfor main thread og køer opp operasjoner(batch) til main thread.~~
 - Gesture
 - Vil ha brukeropplevelsen fra native, og utviklingsmiløet fra web.(React)
-- ~~Brukes internt i Facebook
-  - Deler av "Groups", Hele Ads Manager, Arrangementer i Facebook-appen(?)~~
+- ~~Brukes internt i Facebook~~
+  - ~~Deler av "Groups", Hele Ads Manager, Arrangementer i Facebook-appen(?)~~
 - ~~npm moduler. Ligger allerede mange ute. Like enkelt som ellers, men man må importere noen filer i XCode-prosjektet.~~
  - ~~Biblioteker som "Relay"~~
 - Er ikke bare enda en JS-bridge til Native. Man får med React også.
