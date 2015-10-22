@@ -7,9 +7,13 @@ Facebook introduserte React Native under React.js i januar, og lanserte React Na
 React Native bygger på React, og litt forenklet kan man si at DOMen for web er byttet ut med native komponenter for iOS og Android. I bunnen er det samme React-kjernen som på web. Dette er enda tydeligere siste versjon av React (0.14) der react-modulen splittes i react og react-dom.
 
 Potensielt kan gjenbruke mye av kodebasen i en eksisterende React.js-app, og det er noe av det jeg ønsket å utforske. Men det er viktig å understreke at med React Native streber ikke Facebook etter "write once, run anywhere", men heller "learn once, run everywhere". De så internt i Facebook at de satt på mye god Javascript-kompetanse, og ikke minst mange personer med god domenekunnskap på bestemte produkter i Facebook. Derfor ønsket man at disse utviklerne kunne implementere samme funksjonalitet, på tvers av plattformer.
+Med React Nativa har man tilgang til de kjente og kjære bibliotekene og APIene man er vant til fra webben.
 
-En viktig punkt er at en React Native app er ikke en HTML-app pakket inn i en native wrapper. Komponentene transformeres til native komponenter, så appen virkelig føles og yter som en native app. I tillegg har man tilgang til alle interne API-er som en native app har. De mest vanlige API-ene er allerede tilgjengelig gjennom React Native, mens andre kan kan skrive og eksponere gjennom React Native sin Javascript-bridge. Mer om dette senere.
+En viktig punkt er at en React Native app er ikke en HTML-app pakket inn i en native wrapper. Komponentene transformeres til native komponenter, så appen virkelig føles og yter som en native app. Facebook ville ikke ødelegge den native ytelsen, og de utnytter derfor at man kan kjøre flere tråder på native kontra på web. Alt arbeid gjøres asynkront i tråder utenfor UI-tråden, køes opp, og sendes i batcher til UI-tråden for å minimere antall operasjoner på UI-tråden. 
 
+I tillegg har man tilgang til alle interne API-er som en native app har. De mest vanlige API-ene er allerede tilgjengelig gjennom React Native, mens andre kan kan skrive og eksponere gjennom React Native sin Javascript-bridge. Mer om dette senere.
+
+React Native brukes aktivt internt i Facebook, og det burde derfor drive utvikling og feilretting videre. De har laget hele "Ads Manager" i React Native for iOS og Android, mens "Groups"-appen og Facebook-appen er hybrider med React Native og ren native kode.
 
 ## Take 1. En liten app fra scratch
 
@@ -41,7 +45,7 @@ Når vi først er inne på utviklingsmiljøet er Chrome debugging et kjærkommen
 
 <img src="img/ReactNative3.png" width="400">
 
-Og skulle man en skjelden gang gjøre en kodefeil viser appen dette tydelig, "in your face", og ikke bortgjemt i en logmelding. Her har jeg f.eks glemt å importere en komponent. Feilmeldingen gir i de fleste tilfeller en klar beskjed på hvor og hva man har gjort feil. Og legger man til `export REACT_EDITOR=atom` i .bashrc kan man klikke direkte i simulatoren og få opp linjen med feil direkte i teksteditoren. Små ting som gjør utviklingen smidigere.
+Og skulle man en skjelden gang gjøre en kodefeil viser appen dette tydelig, "in your face", og ikke bortgjemt i en logmelding. Her har jeg f.eks glemt å importere en komponent. Feilmeldingen gir i de fleste tilfeller en klar beskjed på hvor og hva man har gjort feil. Og legger man til editoren sin i .bashrc på denne måten, `export REACT_EDITOR=atom`, kan man klikke direkte i simulatoren og få opp linjen med feil direkte i teksteditoren. Små ting som gjør utviklingen smidigere.
 
 <img src="img/ReactNative4.png" width="400">
 
@@ -89,7 +93,9 @@ var BekkAnsattRN = React.createClass({
 ```
 
 Dette er kjent for de fleste som har sett React før. En render-funksjon som rendrer denne komponenten.
-Vi ser her at `<div>` har blitt til `<View>` og `<span>` har blitt til `<Text>`. React Native pakker inn native komponenter i en deklarativ syntax, som gjør det lettere å lese og forstå hvordan et view vil se ut. I Objective-C måtte man instansiert ulike views, lagt de til som subviews på et container view. Noe ala dette:
+Vi ser her at `<div>` har blitt til `<View>` og `<span>` har blitt til `<Text>`. React Native pakker inn native komponenter i en deklarativ syntaks, som gjør det lettere å lese og forstå hvordan et view vil se ut. Man slipper mye 'matematikk' og beregning av posisjoner og størrelser. Man sier hvordan man vil at view skal se ut, så "fikser React resten". Man trenger ikke å måle, og lese fra view for å se hvordan det ser ut, for så gjøre endringer på det.
+
+I Objective-C måtte man instansiert ulike views, lagt de til som subviews på et container view. Noe ala dette:
 
 ```
 [self.view addSubview:welcomeText];
@@ -136,7 +142,7 @@ RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
                                                    launchOptions:launchOptions];
 ```
 
-som binder JS-appen til et native view. Det er på denne måten man kan inkludere React Native i delere av en eksistende app. I Facebook-appen er f.eks 'arrangementer' skrevet i React Native, mens resten er Objective-C. Men man mergker ikke forskjellen, fordi alt føles native.
+som binder JS-appen til et native view. Det er på denne måten man kan inkludere React Native i delere av en eksistende app. I Facebook-appen er f.eks 'arrangementer' skrevet i React Native, mens resten er Objective-C. Men man merker ikke forskjellen, fordi alt føles native.
 
 
 ### La oss kode
@@ -233,7 +239,7 @@ var styles = StyleSheet.create({
 module.exports = AnsattListe;
 ```
 
-Her har vi en `ListView`. Den har noen funksjoner man må implementere. `dataSource`, som definerer en liste med elementer som skal rendres, og renderRow`, som returnerer hvordan en rad skal rendres.
+Her har vi en `ListView`. Den har noen funksjoner man må implementere. `dataSource`, som definerer en liste med elementer som skal rendres, og `renderRow`, som returnerer hvordan en rad skal rendres.
 
 <img src="img/ReactNative5.png" width="400">
 
@@ -495,7 +501,7 @@ module.exports = PhoneLink;
 
 Siden denne funksjonaliteten bruker iOS-spesifikke komponenter er det en fordel å skille denne ut av profilsiden, slik at det vil være lettere å lage tilsvarende funksjonalitet for Android. Jeg har ikke testet dette, men det skal være mulig å skille komponenter vha. filnavn, slik som .android.js og .ios.js.
 
-Hvis vi nå legger til dette i AnsattListe,
+Hvis vi nå legger til dette i AnsattListe, og sender denne som en property til AnsattRad
 ```js
 selectAnsatt(ansatt) {
   this.props.navigator.push({
@@ -521,7 +527,7 @@ Når jeg først hadde blitt litt bedre kjent med React Native ønsket jeg å se 
 Første steg jeg gjorde var å endre all import av `react` til `react-native`. 
 
 ### Steg 2. Endre views og styles
-Neste steg var å bytte ut alle DOM-tags med React Native tags. Allerede her ser man at man ikke kan flytte weben rett inn i en native app. Og det ønsker man ikke heller. Man ønsker å følge plattformens konvensjoner og design guidelines. Fagdag-appen inneholder en expand-liste, men rader som åpnes ved klikk. Dette er ikke rett frem på native, og ville krevd en customkomponent,  så jeg valgte derfor å splitte innholdet i hver rad til et egen view, slik at klikk på en rad åpner en ny side med innholdet.
+Neste steg var å bytte ut alle DOM-tags med React Native tags. Allerede her ser man at man ikke kan flytte weben rett inn i en native app. Og det ønsker man ikke heller. Man ønsker å følge plattformens konvensjoner og design guidelines. Fagdag-appen inneholder en expand-liste, men rader som åpnes ved klikk. Dette er ikke rett frem på native, og ville krevd en customkomponent,  så jeg valgte derfor å splitte innholdet i hver rad til et egen view, og bruke `NavigatorIOS`, slik at klikk på en rad åpner en ny side med innholdet. 
 
 Samtidig med bytte av komponenter la jeg til stiler, og fjernet referanser til klasser.
 
@@ -613,7 +619,7 @@ return (<article className={classes}>
         </article>);
 ```
 
-ble til i React Native:
+ble til dette i React Native:
 
 ```js
 return (<View style={styles.talkDetailsItemLightningTalk}>
@@ -658,7 +664,7 @@ Deretter kan man bruke fontene i stilobjektene på denne måten:
 Akkurat font navnet kan være litt vanskelig å vite, men linken over viser en måte man kan finne det på. 
 
 ### Steg 5. Fjerne LocalStorage
-Fagdag appen lagrer hvilke foredrag man har merket med stjerne i `LocalStorage`. `LocalStorage` tilhører webben, mens det tilsvarende i React Native heter `AsyncStorage`. Api-et er stort sett det samme, så her var det bare å bytte 
+Fagdag-appen lagrer hvilke foredrag man har merket med stjerne i `LocalStorage`. `LocalStorage` tilhører webben, mens det tilsvarende i React Native heter `AsyncStorage`. Api-et er stort sett det samme, så her var det bare å bytte 
 
 ```js
 Stars.prototype.save = function() {
@@ -696,25 +702,29 @@ Da prøver vi å kjøre opp. Pang! Ja, vi mangler en del dependencies i package.
 
 <img src="img/ReactNative12.png" width="400">
 
-Fagdag-appen kjøres vanligvis opp i et Node.js kjøretidsmiljø. React Native spinner opp i JavaScriptCore, og har ikke tilgang til en del innebyggede moduler i Node. Her ble det en del Googling, og prøving og feiling. Jeg endte til slutt opp med å bruke Webpack til å bundle appen. Det er ikke optimalt, da det blir enda en avhengighet, og den kjører saktere enn den vanlig Packageren. Det kan også hende det smeller senere, men nå fikk jeg appen opp og kjøre igjen, og var fornøyd med det. Jeg leste blant annet at Webpack ikke gikk godt sammen med React Native på Android, da man må endre portnummeret appen kjører mot, og det er ikke mulig på Android. Det er også rapportert problemer med transpilering fra ES6 med Webpack og React Native.
+Fagdag-appen kjøres i et Node.js kjøretidsmiljø. React Native kjører opp i JavaScriptCore, og har ikke tilgang til en del innebyggede moduler i Node. Her ble det en del 'Googling', og prøving og feiling. Jeg endte til slutt opp med å bruke Webpack til å bundle appen. Det fantes allerede en løsning for dette (https://github.com/mjohnston/react-native-webpack-server). Det er ikke optimalt, da det blir enda en avhengighet, og den kjører saktere enn den vanlig Packageren. Det kan også hende det smeller senere, men nå fikk jeg appen opp og kjøre igjen, og var fornøyd med det. Jeg leste blant annet at Webpack ikke gikk godt sammen med React Native på Android, da man må endre portnummeret appen kjører mot, og det er ikke mulig på Android. Det er også rapportert problemer med transpilering fra ES6 med Webpack og React Native.
 
 For å kjøre igang appen med webpack måtte jeg installere noen nye npm-moduler, legge til en webpack-config, endre index.ios.js til main.js og endre appen til å kjøre mot port 8080. Bygging av appen må nå startes med `npm start` i terminalen. 
 
 ### Men React fungerer ikke som React
 
-Da jeg begynte å teste appen ved å merke foredrag med stjerne oppdaget jeg at appen ikke oppførte seg som forventet. Det skjedde ingenting. Ved klikk på en stjerne ble den kalt et callback, som satt en state lengre opp i view-hierarkiet, som automatisk gjør at view (og subviews) rendres på nytt. Men problemet er at når man bruker `NavigatorIOS` ser ikke React på dette som et subview, og props bobler ikke ned og rendrer på nytt. 
-Nok en runde med Googling viste at Facebook ikke bruker `NavigatorIOS` internt, og de frir derfor til open source communityet til å ta tak i issues.  
-Facebook bruker `Navigator` internt. 
+Da jeg begynte å teste appen ved å merke foredrag med stjerne oppdaget jeg at appen ikke oppførte seg som forventet. Det skjedde ingenting. Ved klikk på en stjerne ble det kalt et callback, som satt en state lengre opp i view-hierarkiet, som automatisk gjør at view (og subviews) rendres på nytt. Men problemet er at når man bruker `NavigatorIOS` ser ikke React på dette som et subview, og props bobler ikke ned og rendrer på nytt. 
+Med `Navigator` må man definere en `renderScene`-funksjon for hver "scene" (side) i navigasjonen. Det er denne funksjonen som blir rendret med gjeldende scene som parameter når state endrer seg. 
 
+Nok en runde med Google viste at Facebook ikke bruker `NavigatorIOS` internt, og de frir derfor til open source communityet til å ta tak i issues.  
+Facebook bruker `Navigator` internt, og dette understrekes i dokumentasjonen:
+
+> Development belongs to open-source community - not used by the React Native team on their apps.
+A result of this is that there is currently a backlog of unresolved bugs, nobody who uses this has stepped up to take ownership for it yet.
 > For most non-trivial apps, you will want to use Navigator - it won't be long before you run into issues when trying to do anything complex with NavigatorIOS.
 
-`Navigator` en JavaScript-implementasjon av navigasjonen. Den er mer fleksibel, men jeg synes den var vanskeligere å implementere enn NavigatorIOS, , animasjonene føltes ikke native og man får ikke den "blurry", litt gjennomsiktige navigasjonslingen. En fordel med `Navigator` er at man kan definere utseende mer selv, med custom `NavigationBar` og at `Navigator` kan brukes på tvers av iOS og Android. Jeg forsøkte også å flytte stjernemerkingen av et foredrag opp i navigasjonslinjen i `NavigatorIOS`. Men dette var ikke mulig da jeg ikke fant noen måte å oppdatere navigasjonen ved endringer i stjernemarkering, og det var heller ikke mulig å endre farge på kun stjerne-ikonet uten å sette farge for hele navigasjonslinjen. 
+`Navigator` en JavaScript-implementasjon av navigasjonen. Den er mer fleksibel, men jeg synes den var vanskeligere å implementere enn NavigatorIOS, , animasjonene føltes ikke native og man får ikke den "blurry", litt gjennomsiktige navigasjonslinjen. En fordel med `Navigator` er at man kan definere utseende mer selv, med custom `NavigationBar` og at `Navigator` kan brukes på tvers av iOS og Android. Jeg forsøkte også å flytte stjernemerkingen av et foredrag opp i navigasjonslinjen i `NavigatorIOS`. Men dette var ikke mulig da jeg ikke fant noen måte å oppdatere navigasjonen ved endringer i stjernemarkering, og det var heller ikke mulig å endre farge på kun stjerne-ikonet uten å sette farge for hele navigasjonslinjen. 
 
 Hvis man nå allikevel bruker `NavigatorIOS` sier erfaringer fra Internettet og tips fra Facebook at man kan opprette en event som trigges når nye props er tilgjengelig og la barne-viewet lytte på det. Men det bryter med hvordan React skal fungere, og `setProps()`  er deprecated, og kommer til å bli fjernet.
 
 > setProps and replaceProps are now deprecated. Instead, call ReactDOM.render again at the top level with the new props.
 
-Skulle jeg gått i gang med en større applikasjon ville jeg enten vurdert å bruke `Navigator` eller fikset på `NavigatorIOS`, slik at denne fungerer som `Navigator` og oppdaterer gjeldende view på stacken. Det finnes allerede flere npm-moduler basert på `Navigator`, så det kan være en ide å sjekke ut disse før man setter i gang. Og siden Facebook bruker denne implementasjonen selv er det stor sjanse for at de optimaliserer animasjonene, slik at det etter hvert føles native. 
+Det er derfor ingen god måte å sette nye props på i barne-viewet. Skulle jeg gått i gang med en større applikasjon ville jeg enten vurdert å bruke `Navigator` eller fikset på `NavigatorIOS`, slik at denne fungerer som `Navigator` og oppdaterer gjeldende view på stacken. Det finnes allerede flere npm-moduler basert på `Navigator`, så det kan være en ide å sjekke ut disse før man setter i gang. Det kan være at disse er enklere i bruk. Og siden Facebook bruker denne implementasjonen selv er det stor sjanse for at de optimaliserer animasjonene, slik at det etter hvert føles native. 
 
 For fagdag-appen valgte jeg å legge til event/lytter i views som blir pushet på stacken (med `NavigatorIOS`):  
 
@@ -731,54 +741,53 @@ For fagdag-appen valgte jeg å legge til event/lytter i views som blir pushet p�
 
 ```
 
-
-Med `Navigator` må man definere en `renderScene`-funksjon for hver "scene" i navigasjonen. Det er denne funksjonen som blir rendret med gjeldende scene som parameter når state endrer seg. 
-
+Da har vi en app som har MVP-funksjonaliteten til en fagdag-app. Nå er ikke dette en type app som nødvendigvis blir noe bedre på på native platform, men den har gitt nyttig kunnskap om hva man bør tenke på tidlig i prosessen, og at valg av komponenter er viktig for den videre utviklingen. Men en kan se for seg visse nativefunksjoner som gjør at denne appen kan få et fortrinn fremfor webappen. F.eks. 3D Touch. Man kan f.eks bruke "Peek and Pop" for å få en forhåndsvisning av et foredrag. Men har vi 3D Touch i React Native. Det bringer meg inn på neste tema, moduler.
 
 ### Moduler
 
+Hvis det er en funksjon man savner i React Native er det stoor sannsynlighet for at noen har laget en modul for dette. Et raskt søk på npmjs.com ga 528 resultater på 'react native'. Importering av moduler er (nesten) like enkelt som vi kjenner det fra Javascript-verden. `npm install <modul> -save` og `require(<modul>)` Forskjellen er at man må importere en fil eller to i XCode dersom modulen skal koble native funksjonalitet til Javascript-broen. Jeg testet moduler for å få tilgang til native 'clipboard', og for å finne retningen på skjermen. Dette var utrolig lett å komme i gang med. I flere tilfeller vil vi nok se at ny funksjonalitet først vil komme som npm-moduler. Det ligger allerede ute moduler for 3D touch (noe uferdig) og quick actions som ble introdusert med iOS9 og iPhone 6S. 
+
+Men her kommer litt av ankepunktet med React Native, og noe jeg var litt spent på da jeg begynte å se på React Native. Tiden fra en ny funksjonalitet blir lagt til i iOS SDK til det er tilgjengelig i React Native. Teamet har uttalt at 3D Touch er en såpass viktig og sentral funksjon at den bør ligge i RN-kjernen (https://github.com/facebook/react-native/issues/2934). Men nå, knappe 2,5 måneder etter iOS9 ble kansert, og 2 måneder etter iPhone 6S/6S Plus ble tilgjengelig, er det fortsatt ikke på plass. 
+
+Så hvis man skal ta i bruk det nyeste og hippeste og være klar til release av nye SDKer, må man enten belage seg på å hjelpe til og lage en modul selv, eller kjøre hybrid, og gjøre dette i native kode. Facebook har gjort sistnevnte (enn så lenge), siden de har 3D Touch funksjonalitet i appen.
+
+
+## Kan man unngå App Store?
 
 
 
-- Ikke single code base
-- Deklarativ beskrivelse av view. Tydeligere hvordan ting skal se ut. Mye matematikk. Sier hvordan vi vil at view skal se ut, så "fikser React resten". Trenger ikke å måle, og lese fra view for å se hvordan det ser ut, for så gjøre endringer på det.
+
+~~- Ikke single code base~~
+~~- Deklarativ beskrivelse av view. Tydeligere hvordan ting skal se ut. Mye matematikk. Sier hvordan vi vil at view skal se ut, så "fikser React resten". Trenger ikke å måle, og lese fra view for å se hvordan det ser ut, for så gjøre endringer på det.~~
 - Ulik look and feel. Vil følge guidelines for den plattformen vi bygger for. Akkurat nå kan man ikke lage native expreience med web.
-- Utviklingsmiljø/fart. Kjent utviklingsmiljø og debugging.  Slipper XCode og å bygge hele tiden. Bedre feilmeldinger.
-- Kan bruke f.eks Relay, fetch()
+~~- Utviklingsmiljø/fart. Kjent utviklingsmiljø og debugging.  Slipper XCode og å bygge hele tiden. Bedre feilmeldinger.~~
+~~- Kan bruke f.eks Relay, fetch()~~
 - Hvorfor native. Bedre brukeropplevelse og funksjonalitet
-- Trådhåndtering. Kan parallellisere. Async oppdatering av view. Gjør operasjoner utenfor main thread og køer opp operasjoner(batch) til main thread.
+~~- Trådhåndtering. Kan parallellisere. Async oppdatering av view. Gjør operasjoner utenfor main thread og køer opp operasjoner(batch) til main thread.~~
 - Gesture
 - Vil ha brukeropplevelsen fra native, og utviklingsmiløet fra web.(React)
-- Brukes internt i Facebook
-  - Deler av "Groups", Hele Ads Manager, Arrangementer i Facebook-appen(?)
-- npm moduler. Ligger allerede mange ute. Like enkelt som ellers, men man må importere noen filer i XCode-prosjektet.
-  - Biblioteker som "Relay"
+~~- Brukes internt i Facebook
+  - Deler av "Groups", Hele Ads Manager, Arrangementer i Facebook-appen(?)~
+~~- npm moduler. Ligger allerede mange ute. Like enkelt som ellers, men man må importere noen filer i XCode-prosjektet.~~
+ ~~- Biblioteker som "Relay"~~
 - Er ikke bare enda en JS-bridge til Native. Man får med React også.
 
 
 - Spørsmål?
   - Hva med mer grafikk-krevende apps, og apps med mange custom-komponenter?
   - Kan vi gjenbruke det vi har løst på web?
-  - Hva med nye API-er? Hvor fort kan man ta i bruk f.eks. 3D Touch?
+  ~~- Hva med nye API-er? Hvor fort kan man ta i bruk f.eks. 3D Touch?~~
+  - Hva med å kjøre JS-koden på en server. Slipper man App Store da?
 
 - Utfordringer:
-  - Støtte på komponenter som Facebook ikke bruker
+  ~~- Støtte på komponenter som Facebook ikke bruker
     - De er ærlige på at de ikke bruker NavigatorIOS, og ber open source community om hjelp på denne komponenten.
       - Jeg fant at denne bryter med React sin virkemåte. En childview oppdaterer en state. Dette trigger en re-rendring lenger oppe i view-treet, men disse bobler ikke ned til view som er pushet på Navigator-stacken. React Native teamet bruker Navigator-komponenten, og sier at en løsning er Event-Subscriber. Men det bryter med React, og man må ta hånd om events når state endrer seg.
       - Løst i Navigator, men jeg synes den var mer kronglete å bruke, og er en JS abstraksjon, som ikke nødvendigvis stemmer med native oppførsel
-      - Et annet problem er styling av NavigatorIOS. Prøvde med stjernemarkering. Vanskelig å oppdatere på endringer.
+      - Et annet problem er styling av NavigatorIOS. Prøvde med stjernemarkering. Vanskelig å oppdatere på endringer.~~
 
 
 - Erfaringer:
   - For å kjøre på fysisk device måtte jeg skru av "Dead code stripping i Xcode".
 
-1. Bytte ut require-moduler
-2. Bytte ut LocalStorage med AsyncStorage. Stort sett asamme API.
-3. Fonts må legges inn i XCode. Webfonts støttes ikke. Kun TTF og OTF i XC
-4. Bilder må inn i Xode. Husk å bygge og starte simulator/packager på nytt.
-5. Møtte på issues med npm/node-moduler
-  - Må bruke en bundler ala Webpack eller Browserify
-    - Denne er litt tregere
-    - Må endre url i Xcode
-    - Kan få litt rare feilmeldinger som jeg ikke fikk uten Webpack
 6. Har ikke løst det å sende inn environment variabler
