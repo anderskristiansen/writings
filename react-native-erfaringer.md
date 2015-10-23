@@ -746,7 +746,7 @@ For fagdag-appen valgte jeg å legge til event/lytter i views som blir pushet p�
 
 Da har vi en app som har MVP-funksjonaliteten til en fagdag-app. Nå er ikke dette en type app som nødvendigvis blir noe bedre på på native platform, men den har gitt nyttig kunnskap om hva man bør tenke på tidlig i prosessen, og at valg av komponenter er viktig for den videre utviklingen. Men en kan se for seg visse nativefunksjoner som gjør at denne appen kan få et fortrinn fremfor webappen. F.eks. 3D Touch. Man kan f.eks bruke "Peek and Pop" for å få en forhåndsvisning av et foredrag. Men har vi 3D Touch i React Native. Det bringer meg inn på neste tema, moduler.
 
-<video width="320" height="240" controls><source src="video/fagdag_navigator.mov" type="video/mov">Your browser does not support the video tag.</video>
+
 
 ### Moduler
 
