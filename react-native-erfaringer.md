@@ -763,8 +763,70 @@ Så hvis man skal ta i bruk det nyeste og hippeste og være klar til release av 
 
 ## Kan man unngå App Store?
 
+En spennende tanke når man kan kjøre Javascriptkoden utenfor appen, er om man kan serve denne Javascript-bundlen eksternt, og på den måten unngå App Store ved mindre endringer som kun gjelder Javascript-koden. Man kan unngå en ukes ventetid for den minste endring, og bringe appen et skritt nærmere Continous deployment. Men godtar Apple dette kanskje du tenker? Ja! I Apple Developer Program Agreement pr. 9.9.2015 (http://adcdownload.apple.com/Documentation/License_Agreements__Apple_Developer_Program/Apple_Developer_Program_Agreement_20150909.pdf) står det dette:
+
+>3.3.2 Except as set forth in the next paragraph, an Application may not download or install
+executable code. Interpreted code may only be used in an Application if all scripts, code and
+interpreters are packaged in the Application and not downloaded. The only exceptions to the
+foregoing are scripts and code downloaded and run by Apple's built-in WebKit framework or
+JavascriptCore, provided that such scripts and code do not change the primary purpose of the
+Application by providing features or functionality that are inconsistent with the intended and
+advertised purpose of the Application as submitted to the App Store. 
+
+JavaScriptCore ja. Det er det React Native kjører på. Så da er det lovlig, og vi kan gruble litt videre. Hva bør man tenke på hvis man skal utnytte dette? 
+Hvis vi starter med en naiv løsning, og oppretter et endepunkt som server en React Native bundle, hvilke utfordringer vil vi møte på? 
+
+https://medium.com/@clayallsopp/so-you-want-to-dynamically-update-your-react-native-app-d1d88bf11ede#.nwd23m3qr
+
+### Offline, eller server nede
+Hva om vi laster ned en app, men ikke åpner den med en gang. Litt senrere vil man utforske appen, men man er ikke koblet til internett, eller serveren som server bundlen er nede. Hvis vi da er avhengige av en server for å hente Javascript-innhold, vil ikke appen lastes. Vi kan løse dette ved å også bundle en versjon med appen, og bruke denne som en fallback dersom man ikke får kontakt med server for å hente siste versjon.
+
+### Sirup på linja, eller treig server
+Hvis man sitter med en dårlig internettforbindelse, og det tar lang tid for å laste appen, er ikke dette en app som blir brukt lenge. Men vi kan bruke den bundlede versjonen når man starter appen, for så å hente server-versjonen asynkront, og bruke denne neste gang appen lastes. 
+
+### Data
+Javascript-bundlen for Fagdags-appen er 2,9 MB. Dette er ikke noe vi ønsker å laste hver gang vi starter appen. Vi trenger caching. Og en liten sjekk mot server for å sjekke om vi har siste versjon.
+
+### Versjonering
+Nå har vi altså potensielt flere versjoner av javascript distribuert gjennom server, og bundlet med app. I tillegg er det mulighet for at det er flere versjoner av native-koden distribuert gjennom App Store. Hva om vi distribuerer javascriptkode som skal spille sammen med en nyere versjon av native delen av appen, men brukeren har ikke oppgradert enda? Vi må ha kontroll over versjonene.
 
 
+## Apphub.io
+
+Apphub.io er en PaaS for React Native, og lover:
+
+>Update React Native apps, instantly.
+Use git push to instantly update iOS apps in production.
+
+Kanskje dette kan løse noen av spørsmålene mine? 
+
+### Komme i gang
+Jeg testet det kjapt med en liten React Native applikasjon, og det var veldig lett å komme i gang. Oppdatering av appen skjer gjennom å laste opp en .ipa-fil, eller bruker AppHubs REST-api, slik at man kan integrere dette med en CI-tjeneste. Jeg testet kun førstnevnte.
+
+<img src="img/AppHub1.png" width="400">
+
+Endringer i Javascript, eller ressurser som bilder kan sendes ut til brukerne uten å gå gjennom App review og App Store.
+
+Appen bundles med en versjon av Javascript-koden, for så å laste ned nye versjoner asynkront, og bruker denne neste gang appen åpnes. Som standard leter Apphub kun etter nye versjoner når enheten er kobler til Wifi, men dette kan man endre på.
+
+
+<img src="img/AppHub2.png" width="400">
+Man kan velge når man deployer versjoner, og man kan også trekke tilbake versjoner.
+
+### Informere om ny versjon
+Man kan også lytte på nye versjoner på Apphub, og f.eks informere brukeren om dette med spørsmål om å oppdatere.
+
+
+### Testing
+Det er også mulig å rulle ut testversjoner til brukere som tester f.eks med TestFlight eller HockeyApp. Da må man sette en variabel i testversjonen man sender ut, så vil disse få tilgang til Javascript som sendes ut i debug-modus.
+
+<img src="img/AppHub3.png" width="400">
+
+### Kjøre selv
+I dokumentasjonen er det et punkt om 'Self-hosting', men dette er ikke beskrevet i noen særlig grad.
+
+### Pris
+Det finnes en gratisversjon, men den er begrenset til 20 daglige aktive brukere og en maksstørrelse på 50 mb. Deretter er det 5 prisnivåer med ulikt antall brukere og app-størrelse, samt mer support i de dyreste versjonene som ligger på $799, eller på forespørsel dersom man har mer enn 20000 brukere. 
 
 
 # TODO:
