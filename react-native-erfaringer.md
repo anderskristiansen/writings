@@ -707,6 +707,10 @@ Fagdag-appen kjøres i et Node.js kjøretidsmiljø. React Native kjører opp i J
 For å kjøre igang appen med webpack måtte jeg installere noen nye npm-moduler, legge til en webpack-config, endre index.ios.js til main.js og endre appen til å kjøre mot port 8080. Bygging av appen må nå startes med `npm start` i terminalen. 
 
 
+Slik så appen ut da jeg omsider fikk startet den:
+<img src="img/ReactNative13.png" width="400">
+<img src="img/ReactNative14.png" width="400">
+<img src="img/ReactNative15.png" width="400">
 
 
 ### Men React fungerer ikke som React
@@ -765,7 +769,7 @@ Så hvis man skal ta i bruk det nyeste og hippeste og være klar til release av 
 
 # TODO:
 
-- Bilder av fagdagsappen
+- ~~Bilder av fagdagsappen~~
 
 - ~~Ikke single code base~~
 - ~~Deklarativ beskrivelse av view. Tydeligere hvordan ting skal se ut. Mye matematikk. Sier hvordan vi vil at view skal se ut, så "fikser React resten". Trenger ikke å måle, og lese fra view for å se hvordan det ser ut, for så gjøre endringer på det.~~
