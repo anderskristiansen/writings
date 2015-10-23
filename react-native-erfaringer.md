@@ -708,6 +708,7 @@ For å kjøre igang appen med webpack måtte jeg installere noen nye npm-moduler
 
 
 
+
 ### Men React fungerer ikke som React
 
 Da jeg begynte å teste appen ved å merke foredrag med stjerne oppdaget jeg at appen ikke oppførte seg som forventet. Det skjedde ingenting. Ved klikk på en stjerne ble det kalt et callback, som satt en state lengre opp i view-hierarkiet, som automatisk gjør at view (og subviews) rendres på nytt. Men problemet er at når man bruker `NavigatorIOS` ser ikke React på dette som et subview, og props bobler ikke ned og rendrer på nytt. 
@@ -744,6 +745,8 @@ For fagdag-appen valgte jeg å legge til event/lytter i views som blir pushet p�
 ```
 
 Da har vi en app som har MVP-funksjonaliteten til en fagdag-app. Nå er ikke dette en type app som nødvendigvis blir noe bedre på på native platform, men den har gitt nyttig kunnskap om hva man bør tenke på tidlig i prosessen, og at valg av komponenter er viktig for den videre utviklingen. Men en kan se for seg visse nativefunksjoner som gjør at denne appen kan få et fortrinn fremfor webappen. F.eks. 3D Touch. Man kan f.eks bruke "Peek and Pop" for å få en forhåndsvisning av et foredrag. Men har vi 3D Touch i React Native. Det bringer meg inn på neste tema, moduler.
+
+<video width="320" height="240" controls><source src="video/fagdag_navigator.mov" type="video/mov">Your browser does not support the video tag.</video>
 
 ### Moduler
 
