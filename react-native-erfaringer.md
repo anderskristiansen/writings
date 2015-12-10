@@ -6,7 +6,7 @@ Facebook introduserte React Native under React.js i januar, og lanserte React Na
 
 React Native bygger på React.js, og litt forenklet kan man si at DOMen for web er byttet ut med native komponenter for iOS og Android. Så man skriver fortsatt Javascript, men får ut native apps i andre enden. I bunnen er det samme React-kjernen som på web. Dette er enda tydeligere siste versjon av React (0.14) der react-modulen splittes i react og react-dom.
 
-Potensielt kan gjenbruke mye av kodebasen i en eksisterende React.js-app, og det er noe av det jeg ønsket å utforske. Men det er viktig å understreke at med React Native streber ikke Facebook etter "write once, run anywhere", men heller "learn once, run everywhere". De så internt i Facebook at de satt på mye god Javascript-kompetanse, og ikke minst mange personer med god domenekunnskap på bestemte produkter i Facebook. Derfor ønsket man at disse utviklerne kunne implementere samme funksjonalitet, på tvers av plattformer.
+Potensielt kan gjenbruke mye av kodebasen i en eksisterende React.js-app, og det er noe av det jeg ønsket å utforske. Men det er viktig å understreke at med React Native streber ikke Facebook etter "write once, run anywhere", men heller "learn once, write everywhere". De så internt i Facebook at de satt på mye god Javascript-kompetanse, og ikke minst mange personer med god domenekunnskap på bestemte produkter i Facebook. Derfor ønsket man at disse utviklerne kunne implementere samme funksjonalitet, på tvers av plattformer.
 Med React Native har man tilgang til de kjente og kjære bibliotekene og APIene man er vant til fra webben.
 
 En viktig punkt er at en React Native app er ikke en HTML-app pakket inn i en native wrapper. Komponentene transformeres til native komponenter, så appen virkelig føles og yter som en native app. Facebook ville ikke ødelegge den native ytelsen, og de utnytter derfor at man kan kjøre flere tråder på native kontra på web. Alt arbeid gjøres asynkront i tråder utenfor UI-tråden, køes opp, og sendes i batcher til UI-tråden for å minimere antall operasjoner på UI-tråden. 
@@ -708,9 +708,8 @@ For å kjøre igang appen med webpack måtte jeg installere noen nye npm-moduler
 
 
 Slik så appen ut da jeg omsider fikk startet den:
-<img src="img/ReactNative13.png" width="400">
-<img src="img/ReactNative14.png" width="400">
-<img src="img/ReactNative15.png" width="400">
+
+<img src="img/ReactNative13.png" width="400"><img src="img/ReactNative14.png" width="400"><img src="img/ReactNative15.png" width="400">
 
 
 ### Men React fungerer ikke som React
@@ -811,6 +810,7 @@ Appen bundles med en versjon av Javascript-koden, for så å laste ned nye versj
 
 
 <img src="img/AppHub2.png" width="400">
+
 Man kan velge når man deployer versjoner, og man kan også trekke tilbake versjoner.
 
 ### Informere om ny versjon
